@@ -180,7 +180,7 @@ npm run test:watch
 
 ## 📫 Contact
 
-Your Name - [SHIVAM]
+Name - SHIVAM
 
 Project Link: [https://github.com/Shivam-knight-owl/product-tour-platform](https://github.com/Shivam-knight-owl/product-tour-platform)
 
