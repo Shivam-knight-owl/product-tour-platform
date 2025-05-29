@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Check, Lock } from "lucide-react";
 import { useTours } from "@/lib/store/tours";
 import { getPlaceholderImage } from "@/lib/utils";
+import { VideoPlayer } from "@/components/VideoPlayer";
 import Image from "next/image";
 
 interface PageProps {
@@ -17,17 +18,17 @@ interface PageProps {
 
 export default function TourViewPage({ params }: PageProps) {
   const router = useRouter();
-  const { getPublicTourById, updateTour } = useTours();
+  const { getTourById, updateTour } = useTours();
   const [currentStep, setCurrentStep] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const tour = getPublicTourById(params.id);
+  const tour = getTourById(params.id);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  if (!tour) {
+  if (!tour || !tour.isPublic) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -128,11 +129,9 @@ export default function TourViewPage({ params }: PageProps) {
                 )
               ) : (
                 isClient && (
-                  <video
+                  <VideoPlayer
                     src={content}
-                    controls
                     className="w-full h-full"
-                    poster={getPlaceholderImage(currentStep)}
                   />
                 )
               )}

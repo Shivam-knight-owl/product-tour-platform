@@ -1,36 +1,193 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Interactive Product Tour Platform
 
-## Getting Started
+A modern, full-stack application for creating and managing interactive product tours. Built with Next.js 14, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Next.js](https://img.shields.io/badge/Next.js-14-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+![Tailwind](https://img.shields.io/badge/Tailwind-3.0-38bdf8)
 
+## 🌟 Features
+
+- **Interactive Tour Creation**
+  - Screen recording functionality
+  - Image upload support
+  - Rich text annotations
+  - Drag-and-drop step reordering
+  - Public/Private tour settings
+
+- **Modern UI/UX**
+  - Responsive design
+  - Dark/Light theme support
+  - Smooth animations
+  - Intuitive navigation
+
+- **Advanced Functionality**
+  - Real-time tour statistics
+  - Completion rate tracking
+  - Step-by-step navigation
+  - Progress tracking
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18.0 or later
+- npm or yarn
+- A modern web browser
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/Shivam-knight-owl/product-tour-platform
+cd product-tour-platform
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Frontend Framework**
+  - Next.js 14 (App Router)
+  - TypeScript
+  - React 18
 
-## Learn More
+- **Styling**
+  - Tailwind CSS
+  - Shadcn UI Components
+  - Framer Motion
 
-To learn more about Next.js, take a look at the following resources:
+- **State Management**
+  - Zustand
+  - Zustand/persist for persistence
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Key Libraries**
+  - @dnd-kit/core - Drag and drop functionality
+  - react-quill - Rich text editing
+  - next-themes - Theme management
+  - MediaRecorder API - Screen recording
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📁 Project Structure
 
-## Deploy on Vercel
+```
+frontend/
+├── src/
+│   ├── app/                    # Next.js pages
+│   │   ├── dashboard/         # Dashboard views
+│   │   │   ├── tours/        # Tour management
+│   │   │   └── analytics/    # Analytics views
+│   │   └── tour/             # Public tour views
+│   ├── components/            # React components
+│   │   ├── ui/               # UI components
+│   │   └── tour/             # Tour components
+│   └── lib/                  # Utilities & stores
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎯 Core Functionality
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Tour Creation
+1. Navigate to Dashboard
+2. Click "Create New Tour"
+3. Set tour name and visibility
+4. Add steps through:
+   - Screen recording
+   - Image upload
+5. Add annotations for each step
+6. Reorder steps as needed
+7. Save tour
+
+### Tour Viewing
+1. Access tour via unique URL
+2. Navigate through steps
+3. View annotations
+4. Track progress
+5. Mark completion
+
+## 🔧 Configuration
+
+### Environment Variables
+Create a `.env.local` file:
+```env
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### Build Configuration
+The `next.config.js` includes:
+- Image domain configuration
+- Build optimizations
+
+## 📦 Available Scripts
+
+```bash
+# Development
+npm run dev       # Start development server
+
+# Production
+npm run build    # Create production build
+npm start        # Start production server
+
+# Utilities
+npm run lint     # Run ESLint
+npm run format   # Format code with Prettier
+```
+
+## 🧪 Testing
+
+```bash
+# Run tests
+npm run test
+
+# Run tests in watch mode
+npm run test:watch
+```
+
+## 📱 Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS](https://tailwindcss.com)
+- [Shadcn UI](https://ui.shadcn.com)
+- [DND Kit](https://dndkit.com)
+
+## 📫 Contact
+
+Your Name - [@yourtwitter](https://twitter.com/yourtwitter)
+
+Project Link: [https://github.com/yourusername/product-tour-platform](https://github.com/yourusername/product-tour-platform)
+
+---
+
+Built with ❤️ using Next.js and TypeScript 

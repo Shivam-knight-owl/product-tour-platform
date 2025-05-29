@@ -36,7 +36,7 @@ export function TourEditor({ tour }: Props) {
   const [steps, setSteps] = useState<TourStepType[]>(tour?.steps || []);
   const [isRecording, setIsRecording] = useState(false);
   const [tourName, setTourName] = useState(tour?.name || "");
-  const [isPublic, setIsPublic] = useState(true);
+  const [isPublic, setIsPublic] = useState(tour?.isPublic ?? true);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -103,13 +103,14 @@ export function TourEditor({ tour }: Props) {
       updateTour(tour.id, {
         name: tourName,
         steps,
+        isPublic,
       });
     } else {
       // Create new tour
       addTour({
         name: tourName,
         steps,
-        isPublic: isPublic
+        isPublic
       });
     }
     router.push("/dashboard/tours");

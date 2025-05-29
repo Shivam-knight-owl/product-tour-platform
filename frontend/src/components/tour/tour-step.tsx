@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
+import { VideoPlayer } from "@/components/VideoPlayer";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -58,11 +59,7 @@ export function TourStep({ step, onAnnotationChange, onDelete }: TourStepProps) 
                 className="h-full w-full object-cover"
               />
             ) : (
-              <video
-                src={step.content}
-                controls
-                className="h-full w-full object-cover"
-              />
+              <VideoPlayer src={step.content} className="h-full w-full" />
             )}
           </div>
           <div className="space-y-2">
