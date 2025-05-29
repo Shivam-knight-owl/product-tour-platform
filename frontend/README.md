@@ -171,11 +171,7 @@ npm run test:watch
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS](https://tailwindcss.com)
@@ -184,9 +180,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📫 Contact
 
-Your Name - [@yourtwitter](https://twitter.com/yourtwitter)
+Your Name - [SHIVAM]
 
-Project Link: [https://github.com/yourusername/product-tour-platform](https://github.com/yourusername/product-tour-platform)
+Project Link: [https://github.com/Shivam-knight-owl/product-tour-platform](https://github.com/Shivam-knight-owl/product-tour-platform)
 
 ---
 
