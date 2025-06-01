@@ -6,31 +6,43 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import type { UserRole } from "@/lib/api";
 
 interface SignUpFormData {
   email: string;
   password: string;
-  confirmPassword: string;
+  role: UserRole;
 }
 
 export default function SignUpPage() {
   const router = useRouter();
+  const { register: registerUser, isLoading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
-  } = useForm<SignUpFormData>();
+  } = useForm<SignUpFormData>({
+    defaultValues: {
+      role: 'USER'
+    }
+  });
 
   const onSubmit = async (data: SignUpFormData) => {
     setIsLoading(true);
-    // TODO: Implement actual signup logic
-    console.log("Sign up data:", data);
-    setTimeout(() => {
+    try {
+      await registerUser(data.email, data.password, data.role);
+      toast.success('Registration successful');
+      router.push('/dashboard');
+      router.refresh(); // Refresh to update auth state
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
       setIsLoading(false);
-      router.push("/dashboard");
-    }, 1500);
+    }
   };
 
   return (
@@ -59,17 +71,18 @@ export default function SignUpPage() {
                 Email
               </label>
               <input
-                {...register("email", {
-                  required: "Email is required",
+                {...register('email', {
+                  required: 'Email is required',
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
+                    message: 'Invalid email address',
                   },
                 })}
                 type="email"
                 id="email"
                 className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 placeholder="you@example.com"
+                disabled={isLoading || authLoading}
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-destructive">
@@ -86,16 +99,18 @@ export default function SignUpPage() {
                 Password
               </label>
               <input
-                {...register("password", {
-                  required: "Password is required",
+                {...register('password', {
+                  required: 'Password is required',
                   minLength: {
-                    value: 8,
-                    message: "Password must be at least 8 characters",
+                    value: 6,
+                    message: 'Password must be at least 6 characters',
                   },
                 })}
                 type="password"
                 id="password"
                 className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                placeholder="••••••••"
+                disabled={isLoading || authLoading}
               />
               {errors.password && (
                 <p className="mt-1 text-sm text-destructive">
@@ -106,47 +121,41 @@ export default function SignUpPage() {
 
             <div>
               <label
-                htmlFor="confirmPassword"
+                htmlFor="role"
                 className="block text-sm font-medium text-foreground"
               >
-                Confirm Password
+                Account Type
               </label>
-              <input
-                {...register("confirmPassword", {
-                  required: "Please confirm your password",
-                  validate: (value) =>
-                    value === watch("password") || "Passwords do not match",
-                })}
-                type="password"
-                id="confirmPassword"
-                className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              />
-              {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-destructive">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
+              <select
+                {...register('role')}
+                id="role"
+                className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                disabled={isLoading || authLoading}
+              >
+                <option value="USER">Creator (Create & Share Tours)</option>
+                <option value="VIEWER">Viewer (View Tours Only)</option>
+              </select>
             </div>
 
             <Button
               type="submit"
               className="w-full"
-              disabled={isLoading}
+              disabled={isLoading || authLoading}
             >
-              {isLoading ? "Creating account..." : "Sign up"}
+              {isLoading || authLoading ? 'Creating account...' : 'Create account'}
             </Button>
           </form>
-        </motion.div>
 
-        <p className="px-8 text-center text-sm text-muted-foreground">
-          Already have an account?{" "}
-          <Link
-            href="/auth/login"
-            className="underline underline-offset-4 hover:text-primary"
-          >
-            Sign in
-          </Link>
-        </p>
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            Already have an account?{' '}
+            <Link
+              href="/auth/login"
+              className="text-primary hover:underline"
+            >
+              Sign in
+            </Link>
+          </p>
+        </motion.div>
       </div>
     </div>
   );

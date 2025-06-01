@@ -1,26 +1,40 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
+import type { UserRole } from '@/contexts/AuthContext';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
-  const { login, isLoading } = useAuth();
+  const { register, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState<UserRole>('VIEWER');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      console.log('Attempting registration with:', { email, role }); // Don't log password
+      await register(email, password, role);
       // Redirect is handled in the auth context
-    } catch (error) {
-      // Error handling is done in the auth context
-      console.error('Login failed:', error);
+    } catch (error: any) {
+      // Detailed error logging
+      console.error('Registration error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          baseURL: error.config?.baseURL,
+          headers: error.config?.headers
+        }
+      });
     }
   };
 
@@ -28,9 +42,9 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="w-full max-w-md space-y-8 rounded-lg border bg-card p-6 shadow-lg">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Welcome Back</h1>
+          <h1 className="text-2xl font-bold">Create an Account</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Please sign in to your account
+            Sign up to get started
           </p>
         </div>
 
@@ -65,6 +79,21 @@ export default function LoginPage() {
                 placeholder="Enter your password"
               />
             </div>
+
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium">
+                Account Type
+              </label>
+              <select
+                id="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value as UserRole)}
+                className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2"
+              >
+                <option value="VIEWER">Viewer (View tours)</option>
+                <option value="CREATOR">Creator (Create and manage tours)</option>
+              </select>
+            </div>
           </div>
 
           <Button
@@ -75,20 +104,20 @@ export default function LoginPage() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing in...
+                Creating Account...
               </>
             ) : (
-              'Sign In'
+              'Create Account'
             )}
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
-            Don't have an account?{' '}
+            Already have an account?{' '}
             <Link
-              href="/auth/register"
+              href="/auth/login"
               className="font-medium text-primary hover:underline"
             >
-              Register here
+              Sign in here
             </Link>
           </p>
         </form>

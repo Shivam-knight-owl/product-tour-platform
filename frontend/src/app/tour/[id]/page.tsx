@@ -1,172 +1,151 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Check, Lock } from "lucide-react";
-import { useTours } from "@/lib/store/tours";
-import { getPlaceholderImage } from "@/lib/utils";
-import { VideoPlayer } from "@/components/VideoPlayer";
-import Image from "next/image";
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
+import { useTours } from '@/lib/store/tours';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import type { Tour } from '@/lib/api';
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function TourViewPage({ params }: PageProps) {
-  const router = useRouter();
-  const { getTourById, updateTour } = useTours();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-  const tour = getTourById(params.id);
+export default function TourDetailPage() {
+  const params = useParams();
+  const tourId = params?.id as string;
+  const { user } = useAuth();
+  const { getTourById, getPublicTourById, isLoading } = useTours();
+  const [tour, setTour] = useState<Tour | null>(null);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    const fetchTour = async () => {
+      try {
+        const tourData = user 
+          ? await getTourById(tourId)
+          : await getPublicTourById(tourId);
+        
+        if (tourData) {
+          setTour(tourData);
+          setError(null);
+        } else {
+          setError('Tour not found or not accessible');
+        }
+      } catch (error: any) {
+        console.error('Error fetching tour:', error);
+        setError(error.response?.data?.message || 'Failed to load tour');
+      }
+    };
 
-  if (!tour || !tour.isPublic) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
-            <Lock className="h-6 w-6 text-muted-foreground" />
-          </div>
-          <h1 className="text-2xl font-bold">Tour Not Available</h1>
-          <p className="text-muted-foreground">
-            This tour is either private or doesn't exist.
-          </p>
-          <Button onClick={() => router.push("/dashboard/tours")}>
-            View Available Tours
-          </Button>
-        </div>
-      </div>
-    );
-  }
+    if (tourId) {
+      fetchTour();
+    }
+  }, [tourId, user, getTourById, getPublicTourById]);
+
+  const currentStep = tour?.steps[currentStepIndex];
+  const isLastStep = currentStepIndex === (tour?.steps.length ?? 0) - 1;
+  const isFirstStep = currentStepIndex === 0;
 
   const handleNext = () => {
-    if (currentStep < tour.steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      setIsComplete(true);
-      // Update tour statistics
-      updateTour(tour.id, {
-        views: tour.views + 1,
-        completionRate: Math.round(((tour.completionRate * tour.views) + 100) / (tour.views + 1)),
-      });
+    if (!isLastStep) {
+      setCurrentStepIndex((prev) => prev + 1);
     }
   };
 
   const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+    if (!isFirstStep) {
+      setCurrentStepIndex((prev) => prev - 1);
     }
   };
 
-  const handleFinish = () => {
-    router.push("/dashboard/tours");
+  const handleClose = () => {
+    if (tour?.isPublic) {
+      window.location.href = '/tours';
+    } else {
+      window.location.href = '/dashboard';
+    }
   };
 
-  if (isComplete) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center space-y-6 p-8 max-w-md"
-        >
-          <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <Check className="w-6 h-6 text-primary" />
-          </div>
-          <h1 className="text-2xl font-bold">Tour Complete!</h1>
-          <p className="text-muted-foreground">
-            You've successfully completed the {tour.name} tour.
-          </p>
-          <Button onClick={handleFinish}>Finish</Button>
-        </motion.div>
+      <div className="flex h-screen w-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
-  const currentTourStep = tour.steps[currentStep];
-  const content = currentTourStep.content || getPlaceholderImage(currentStep);
+  if (error || !tour) {
+    return (
+      <div className="flex h-screen w-screen flex-col items-center justify-center gap-4">
+        <h1 className="text-2xl font-semibold text-destructive">
+          {error || 'Tour not found'}
+        </h1>
+        <Button onClick={handleClose}>
+          Return to {tour?.isPublic ? 'Tours' : 'Dashboard'}
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Progress bar */}
-      <div className="h-1 bg-muted">
-        <div
-          className="h-full bg-primary transition-all duration-300"
-          style={{
-            width: `${((currentStep + 1) / tour.steps.length) * 100}%`,
-          }}
-        />
-      </div>
+    <div className="relative flex h-screen w-screen flex-col items-center justify-center bg-black/50">
+      <div className="container relative mx-auto flex max-w-4xl flex-col items-center justify-center rounded-lg bg-background p-8 shadow-lg">
+        <Button
+          variant="ghost"
+          className="absolute right-4 top-4"
+          onClick={handleClose}
+        >
+          ✕
+        </Button>
 
-      {/* Main content */}
-      <div className="flex-1 container max-w-6xl mx-auto py-8 px-4">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-8"
-          >
-            {/* Step content */}
-            <div className="aspect-video relative rounded-lg border overflow-hidden bg-muted">
-              {currentTourStep.type === "image" ? (
-                isClient && (
-                  <Image
-                    src={content}
-                    alt={`Step ${currentStep + 1}`}
-                    fill
-                    className="object-contain"
+        <div className="mb-8 text-center">
+          <h1 className="mb-2 text-3xl font-bold">{tour.title}</h1>
+          {tour.description && (
+            <p className="text-muted-foreground">{tour.description}</p>
+          )}
+        </div>
+
+        <div className="relative min-h-[300px] w-full">
+          <AnimatePresence mode="wait">
+            {currentStep && (
+              <motion.div
+                key={currentStep.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col gap-4"
+              >
+                <h2 className="text-xl font-semibold">{currentStep.title}</h2>
+                {currentStep.body && <p>{currentStep.body}</p>}
+                {currentStep.imageUrl && (
+                  <img
+                    src={currentStep.imageUrl}
+                    alt={currentStep.title}
+                    className="mx-auto max-h-[400px] rounded-lg object-contain"
                   />
-                )
-              ) : (
-                isClient && (
-                  <VideoPlayer
-                    src={content}
-                    className="w-full h-full"
-                  />
-                )
-              )}
-            </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
-            {/* Annotation */}
-            <div className="bg-card rounded-lg border p-6">
-              <p className="text-lg">{currentTourStep.annotation}</p>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Navigation */}
-        <div className="flex justify-between mt-8">
+        <div className="mt-8 flex w-full items-center justify-between">
           <Button
-            variant="outline"
             onClick={handlePrevious}
-            disabled={currentStep === 0}
-            className="gap-2"
+            disabled={isFirstStep}
+            variant="outline"
           >
-            <ArrowLeft className="w-4 h-4" />
             Previous
           </Button>
-          <div className="text-sm text-muted-foreground">
-            Step {currentStep + 1} of {tour.steps.length}
-          </div>
-          <Button onClick={handleNext} className="gap-2">
-            {currentStep === tour.steps.length - 1 ? (
-              "Complete Tour"
-            ) : (
-              <>
-                Next
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
+          <span className="text-sm text-muted-foreground">
+            Step {currentStepIndex + 1} of {tour.steps.length}
+          </span>
+          <Button
+            onClick={handleNext}
+            disabled={isLastStep}
+          >
+            Next
           </Button>
         </div>
       </div>
